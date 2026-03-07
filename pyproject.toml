@@ -1,0 +1,24 @@
+[project]
+name = "desktop-vision-automation"
+version = "0.1.0"
+description = "Vision-based desktop automation using Claude visual grounding to locate and interact with desktop icons on Windows 10/11."
+requires-python = ">=3.10"
+
+dependencies = [
+    "opencv-python>=4.8.0",
+    "mss>=9.0.0",
+    "pyautogui>=0.9.54",
+    "pillow>=10.0.0",
+    "requests>=2.31.0",
+    "pyperclip>=1.8.2",
+    "pywin32>=306",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.4.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
