@@ -1,0 +1,13 @@
+Environment: Windows 10 / Windows 11
+Python: 3.9 - 3.11
+Install:
+    python -m venv venv
+    venv\Scripts\activate
+    pip install -r requirements.txt
+Run:
+    venv\Scripts\activate
+    python main.py
+Notes:
+- Program writes output to the current user's Desktop/tjm-project.
+- Template file expected: notepad_icon.png next to main.py.
+- Do NOT commit venv/ to the repo.
