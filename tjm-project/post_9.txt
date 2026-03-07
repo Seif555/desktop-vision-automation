@@ -1,3 +1,0 @@
-Title: Sample Title 9
-
-Fallback post body for offline testing.
