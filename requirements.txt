@@ -1,8 +1,0 @@
-opencv-python
-mss
-pyautogui
-requests
-psutil
-pyperclip
-numpy
-pygetwindow
