@@ -1,100 +1,104 @@
-Vision-Based Desktop Automation — Notepad Launcher
+# Vision-Based Desktop Automation — Notepad Launcher
 
-Project goal
-A lightweight Python program that visually finds a Notepad desktop icon on a 1920×1080 desktop, double-clicks it, and types/saves the first 10 posts fetched from the demo API.
+## What it does
+A Python program that visually locates a Notepad desktop icon on a 1920×1080
+Windows desktop, double-clicks it, and saves the first 10 posts fetched from
+the JSONPlaceholder demo API as `.txt` files.
 
-Quick summary
+## How it works
 
-Visual grounding via masked, multi-scale template matching (OpenCV).
+### Visual grounding
+Icon detection uses **masked multi-scale template matching** (OpenCV):
 
-Color-aware matching and simple heuristics (blue-region rejection and folder-thumbnail rejection) to reduce wallpaper false positives.
+1. A reference PNG of the target icon is placed next to `main.py`
+2. A desktop screenshot is taken before each launch
+3. The alpha channel is extracted as a mask — transparent pixels are excluded
+   from scoring entirely, so the wallpaper colour never affects the result
+4. The template is matched against the screenshot at 12 different scales
+   (0.5× to 2.5×) to handle different icon view sizes
+5. A folder-thumbnail false-positive filter rejects yellow Windows folder icons
+6. The best match above the confidence threshold is accepted and clicked
 
-Annotated screenshots saved to ./screenshots/ inside the repo for inspection.
+This works for **any icon** — replace `notepad_icon.png` with any PNG to
+target a different application.
 
-Runtime writes output files to a Desktop folder named tjm-project (this folder should exist on the user’s Desktop at runtime and is outside the repo).
+### Automation workflow
+For each of the 10 posts:
+1. Minimise all windows to reveal the desktop
+2. Screenshot → detect icon → double-click to launch Notepad
+3. Paste post content (`Title: {title}\n\n{body}`) into Notepad
+4. Save file directly to `Desktop/tjm-project/post_{id}.txt` via Python
+5. Close Notepad → repeat
 
-Quick links
+## Repo layout
+```
+desktop-vision-automation/
+├── main.py              # entry point — fetch posts, automation loop
+├── grounding.py         # OpenCV icon detection
+├── utils.py             # Windows helpers (desktop path, Notepad control)
+├── notepad_icon.png     # reference icon — replace to target a different app
+├── requirements.txt     # pip dependencies
+├── pyproject.toml       # uv configuration
+├── uv.lock
+├── .gitignore
+├── README.md
+└── screenshots/
+    ├── top-left.png
+    ├── center.png
+    └── bottom-right.png
+```
 
-Demo posts API used: JSONPlaceholder
+> **Note:** If you downloaded this as a ZIP from GitHub, rename the extracted
+> folder from `desktop-vision-automation-main` to `desktop-vision-automation`
+> before running. Or clone directly to avoid this:
+> ```
+> git clone <repo-url>
+> ```
 
-Repository hosting: GitHub
+## Installation & run
 
-Repo layout (what this repo contains)
-desktop-vision-automation/        <-- repo root
-├─ main.py                       # entrypoint (automation loop).
-├─ grounding.py                  # detection engine (OpenCV).
-├─ utils.py                      # Windows helpers (desktop path, Notepad control).
-├─ notepad_icon.png              # reference icon (PNG) used for matching reeplace with your own  │                                # if needed with the same name.
-├─ requirements.txt              # pip-installable deps (recommended).
-├─ README.md                     # this file.
-├─ screenshots/
-│  ├─ top-left.png
-│  ├─ center.png
-│  └─ bottom-right.png
-└─ .gitignore
+### Using uv (recommended)
+```powershell
+git clone <repo-url>
+cd desktop-vision-automation
+uv sync
+uv run python main.py
+```
 
-Note: The runtime output folder tjm-project is expected to be created on the Desktop (outside the repo) before running the script and it has 10 test posts already and you can delete them if you want. The repo contains the code and the required annotated screenshots.
-
-Installation & run (generic instructions)
-
-Create a Python virtual environment and activate it:
-
+### Using pip
+```powershell
 python -m venv .venv
 .venv\Scripts\activate
-
-Install dependencies:
-
 pip install -r requirements.txt
-
-(If you prefer uv or poetry, install via your chosen tool using the included lockfile.)
-
-Ensure a folder named tjm-project exists on the Desktop (this is where the script will save files at runtime). Example: create a folder named tjm-project on the Desktop.
-
-Run the program:
-
 python main.py
+```
 
-Dependencies
+## Requirements
+- Windows 10/11 at 1920×1080
+- A Notepad shortcut on the Desktop before running
+- Python 3.10+
 
-numpy==2.4.2
-opencv-python==4.13.0.92
-mss==10.1.0
-pyautogui
-pyperclip
-pywin32
-requests
+## Output
+Files are saved to `Desktop/tjm-project/post_1.txt` through `post_10.txt`.
+Annotated detection screenshots are saved to `screenshots/latest_detection.png`
+and overwritten on each run. Failed detection attempts are saved as
+`screenshots/debug_failed_post{N}_attempt{N}.png`.
 
-(Adjust versions if you prefer; these reflect the packages used by the code.)
+## Discussion notes
 
-Why an annotated image may show a bounding box but the run printed “rejected”
+**Why template matching?**  
+No API key, no internet, no model download — fully local and free. The alpha
+mask makes it background-independent: transparent pixels are excluded from the
+correlation score entirely so wallpaper colour has no effect.
 
-The detector saves the best candidate for each attempt (so you can inspect what it considered). After generating that candidate it applies final checks (threshold, blue-region rejection, folder-thumbnail rejection). If those heuristics reject the candidate, the run prints Rejected but the candidate image is kept for debugging. If you prefer only accepted detections to be saved, change that behavior in grounding.py (easy one-line edit).
+**Known limitations**  
+- Very busy wallpapers can produce false positives at the confidence threshold;
+  the retry logic (3 attempts) mitigates this
+- Small icon view (16px) is harder to match from a medium-size reference
 
-.gitignore (recommended contents — put at repo root)
-# Virtualenv
-.venv/
-venv/
+**How to target a different icon**  
+Replace `notepad_icon.png` with any PNG of the new target (transparent
+background recommended). The file is auto-discovered by name.
 
-# Python cache
-__pycache__/
-*.pyc
-
-# OS and editor
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Keep screenshots but ignore temporary ones
-screenshots/tmp_*
-screenshots/*.log
-
-Notes for users
-
-The program expects a Notepad shortcut to be present on the Desktop before running.
-
-The code is written to work with 1920×1080 desktop resolution (adjustable in code if required).
-
-The code is written to work with windows 10/11.
-
-The detection is template based — replace notepad_icon.png with another PNG (transparent background recommended) to target a different icon.
+**How to change resolution**  
+Update `SCREEN_W, SCREEN_H` in `grounding.py`.
