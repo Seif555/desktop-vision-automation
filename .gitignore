@@ -1,0 +1,17 @@
+# Virtualenv
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Keep screenshots but ignore temporary ones
+screenshots/tmp_*
+screenshots/*.log
