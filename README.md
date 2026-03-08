@@ -31,10 +31,9 @@ desktop-vision-automation/        <-- repo root
 │  ├─ top-left.png
 │  ├─ center.png
 │  └─ bottom-right.png
-├─ demo/                         # optional: small demo GIF or short video (optional).
 └─ .gitignore
 
-Note: The runtime output folder tjm-project is expected to be created on the Desktop (outside the repo) before running the script. The repo contains the code and the required annotated screenshots.
+Note: The runtime output folder tjm-project is expected to be created on the Desktop (outside the repo) before running the script and it has 10 test posts already and you can delete them if you want. The repo contains the code and the required annotated screenshots.
 
 Installation & run (generic instructions)
 
@@ -54,7 +53,9 @@ Ensure a folder named tjm-project exists on the Desktop (this is where the scrip
 Run the program:
 
 python main.py
-Dependencies (examples for requirements.txt)
+
+Dependencies
+
 numpy==2.4.2
 opencv-python==4.13.0.92
 mss==10.1.0
@@ -87,6 +88,7 @@ Thumbs.db
 # Keep screenshots but ignore temporary ones
 screenshots/tmp_*
 screenshots/*.log
+
 Notes for users
 
 The program expects a Notepad shortcut to be present on the Desktop before running.
